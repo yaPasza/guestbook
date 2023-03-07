@@ -15,6 +15,11 @@ if (isset($_POST['auth'])) {
     header("Location: index.php");
     die;
 }
+if (isset($_POST['add'])) {
+    save_message();
+    header("Location: index.php");
+    die;
+}
 if (isset($_GET['do']) && $_GET['do'] == 'exit') {
     if (!empty($_SESSION['user'])) {
         unset($_SESSION['user']);
@@ -22,6 +27,9 @@ if (isset($_GET['do']) && $_GET['do'] == 'exit') {
     header("Location: index.php");
     die;
 }
+
+$messages = get_messages();
+$messages = array_reverse($messages);
 ?>
 <!doctype html>
 <html lang="en">
@@ -117,7 +125,7 @@ if (isset($_GET['do']) && $_GET['do'] == 'exit') {
 
             <div class="row">
                 <div class="col-md-6 offset-md-3">
-                    <p>Добро пожаловать, <?= htmlspecialchars($_SESSION['user']['name']); ?>! <a href="?do=exit">Log out</a></>
+                    <p>Добро пожаловать, <?= htmlspecialchars($_SESSION['user']['name']); ?>! <a href="?do=exit">Выйти</a></>
                 </div>
             </div>
 
@@ -136,21 +144,22 @@ if (isset($_GET['do']) && $_GET['do'] == 'exit') {
 
         <?php endif; ?>
 
-        <div class="row">
-            <div class="col-md-6 offset-md-3">
-                <hr>
-                <div class="card my-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Автор: User</h5>
-                        <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Blanditiis distinctio
-                            est illum in ipsum nemo nostrum odit optio quibusdam velit. Commodi dolores dolorum ex facere
-                            maiores porro, reprehenderit velit voluptatum.</p>
-                        <p>Дата: 01.01.2000</p>
-                    </div>
+        <?php if (!empty($messages)) : ?>
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <hr>
+                    <?php foreach ($messages as $message) : ?>
+                        <div class="card my-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Автор: <?= htmlspecialchars($message['name']) ?></h5>
+                                <p class="card-text"><?= nl2br(htmlspecialchars($message['message'])) ?></p>
+                                <p>Дата: <?= $message['created_at'] ?></p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
-        </div>
-
+        <?php endif; ?>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
